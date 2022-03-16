@@ -17,8 +17,8 @@ library(RColorBrewer)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
     
-    output$bearsUploaded <- reactive({
-        if(!is.null(input$bears)) return(TRUE)
+    output$mocapUploaded <- reactive({
+        if(!is.null(input$mocap)) return(TRUE)
     })
     
     output$opponentUploaded <- reactive({
@@ -29,13 +29,13 @@ shinyServer(function(input, output) {
         if(!is.null(input$xvariable)) return(TRUE)
     })
     
-    outputOptions(output, 'bearsUploaded', suspendWhenHidden=FALSE)
+    outputOptions(output, 'mocapUploaded', suspendWhenHidden=FALSE)
     outputOptions(output, 'opponentUploaded', suspendWhenHidden=FALSE)
     outputOptions(output, 'varsSelected', suspendWhenHidden=FALSE)
     
     # Variable input
     # outSheet <- reactive({
-    #     mydata <- bearsWrangled()
+    #     mydata <- mocapWrangled()
     #     if (class(mydata) == 'list'){
     #         names <- names(data.list)
     #     } else {
@@ -45,7 +45,7 @@ shinyServer(function(input, output) {
     # })
     
     outNames <- reactive({
-        mydata <- bearsWrangled()
+        mydata <- mocapWrangled()
         # if (length(mydata) == 1){
         #     mydata <- mydata[[1]]
         mydata <- mydata[-1]
@@ -56,8 +56,8 @@ shinyServer(function(input, output) {
         return(names)
     })
     
-    bearsName <- reactive({
-        temp.data <- bearsRaw()
+    mocapName <- reactive({
+        temp.data <- mocapRaw()
         teamName <- temp.data[[1,1]]
         return(teamName)
     })
@@ -80,99 +80,54 @@ shinyServer(function(input, output) {
     #     selectInput('sheet', 'Select Data Sheet', outSheet(), selected = 'Overall')
     # })
     
-    bearsRaw <- reactive({
-        raw.data <- suppressMessages(readxl::read_excel(Sys.glob(input$bears$datapath), col_names = FALSE))
+    mocapRaw <- reactive({
+        raw.data <- suppressMessages(readxl::read_excel(Sys.glob(input$mocap$datapath), col_names = FALSE))
         return(raw.data)
     })
     
-    opponentRaw <- reactive({
-        raw.data <- suppressMessages(readxl::read_excel(Sys.glob(input$opponent$datapath), col_names = FALSE))
-        return(raw.data)
-    })
     
-    bearsWrangled <- reactive({
-            raw.data <- bearsRaw()
-            bearsWrangled <- wrangle_data(raw.data, modification = input$modify)
-        return(bearsWrangled)
-    })
-    
-    opponentWrangled <- reactive({
-        raw.data <- opponentRaw()
-        opponentWrangled <- wrangle_data(raw.data, modification = input$modify)
-        return(opponentWrangled)
+    mocapWrangled <- reactive({
+            raw.data <- mocapRaw()
+            mocapWrangled <- wrangle_data(raw.data, modification = input$modify)
+        return(mocapWrangled)
     })
 
     
-    # Bears Scatterplot
-    output$bearsScatter <- renderPlotly({
+    # mocap Scatterplot
+    output$mocapScatter <- renderPlotly({
         x <- input$xvar
         y <- input$yvar
         # if (is.null(input$sheet)){
-        #     df <- bearsWrangled()[[1]]
+        #     df <- mocapWrangled()[[1]]
         # } else if (!is.null(input$sheet)){
-        #     df <- bearsWrangled()[[input$sheet]]
+        #     df <- mocapWrangled()[[input$sheet]]
         # }
-        scatterPlot(bearsWrangled(), x, y, bearsName())
+        scatterPlot(mocapWrangled(), x, y, mocapName())
     })
     
-    # Opponent scatterplot
-    output$opponentScatter <- renderPlotly({
-        x <- input$xvar
+    # mocap Bar
+    output$mocapBar <- renderPlotly({
         y <- input$yvar
-        # if (is.null(input$sheet)){
-        #     df <- opponentWrangled()[[1]]
-        # } else if (!is.null(input$sheet)){
-        #     df <- opponentWrangled()[[input$sheet]]
-        # }
-        scatterPlot(opponentWrangled(), x, y, opponentName())
-    })
-    
-    # Bears Bar
-    output$bearsBar <- renderPlotly({
-        y <- input$yvar
-        # if (length(bearsWrangled() == 1)){
-        #     df <- bearsWrangled()[[1]]
+        # if (length(mocapWrangled() == 1)){
+        #     df <- mocapWrangled()[[1]]
         # } else {
-        #     df <- bearsWrangled()[[input$sheet]]
+        #     df <- mocapWrangled()[[input$sheet]]
         # }
-        barPlot(bearsWrangled(), y, title = bearsName())
+        barPlot(mocapWrangled(), y, title = mocapName())
     })
     
-    # Opponent Bar
-    output$opponentBar <- renderPlotly({
-        y <- input$yvar
-        # if (length(opponentWrangled()) == 1){
-        #     df <- opponentWrangled()[[1]]
-        # } else {
-        #     df <- opponentWrangled()[[input$sheet]]
-        # }
-        barPlot(opponentWrangled(), y, title = opponentName())
-    })
     
-    output$combBears <- renderPlotly({
+    output$combmocap <- renderPlotly({
         y <- input$yvar
         
-        ymin1 <- min(bearsWrangled()[y])
+        ymin1 <- min(mocapWrangled()[y])
         ymin2 <- min(opponentWrangled()[y])
         ymin <- min(c(ymin1, ymin2))
-        ymax1 <- max(bearsWrangled()[y])
+        ymax1 <- max(mocapWrangled()[y])
         ymax2 <- max(opponentWrangled()[y])
         ymax <- max(c(ymax1, ymax2))
         
-        barPlot(bearsWrangled(), y, ymin, ymax, title = bearsName())
-    })
-    
-    output$combOpponent <- renderPlotly({
-        y <- input$yvar
-        
-        ymin1 <- min(bearsWrangled()[y])
-        ymin2 <- min(opponentWrangled()[y])
-        ymin <- min(c(ymin1, ymin2))
-        ymax1 <- max(bearsWrangled()[y])
-        ymax2 <- max(opponentWrangled()[y])
-        ymax <- max(c(ymax1, ymax2))
-        
-        barPlot(opponentWrangled(), y, ymin, ymax, title = opponentName())
+        barPlot(mocapWrangled(), y, ymin, ymax, title = mocapName())
     })
     
 })

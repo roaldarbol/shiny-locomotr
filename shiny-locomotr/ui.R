@@ -18,24 +18,24 @@ library(png)
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
     # Application title
-    setBackgroundImage(src = "bears.jpg"),
-    titlePanel(h1(img(height = 1)), windowTitle = 'Bears Analytics'),
+    setBackgroundImage(src = "dansk-atletik.jpeg"),
+    titlePanel(h1(img(height = 1)), windowTitle = 'Analytics'),
     
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
-            titlePanel(h1(img(width = 200, src="Bears-Analytics-3.png"), align="center")),
-            # titlePanel(h1('Bears Analytics', align="center")),
-            passwordInput('passwd', label='Enter Password'),
-            conditionalPanel(condition= "input.passwd == 'Bears'",
-                             
-                             conditionalPanel(condition="output.bearsUploaded",
+            titlePanel(h1(img(width = 200, src="locomotr-transparent.png"), align="center")),
+            # titlePanel(h1('mocap Analytics', align="center")),
+            # passwordInput('passwd', label='Enter Password'),
+            # conditionalPanel(condition= "input.passwd == 'mocap'",
+            #                  
+                             conditionalPanel(condition="output.mocapUploaded",
                                               # conditionalPanel(condition="!is.null(output.outSheet)",
                                               #                  uiOutput('sheet')),
                                               uiOutput('yvar'),
                                               uiOutput('xvar')),
                              
-                             conditionalPanel(condition="output.bearsUploaded",
+                             conditionalPanel(condition="output.mocapUploaded",
                                               radioButtons('modify', 'Options:', 
                                                            c('Total' = 'total',
                                                              'Per 40 Mins' = 'forty',
@@ -44,14 +44,10 @@ shinyUI(fluidPage(
                              #     "aspect", "Select Aspect",
                              #     c("Boxscore", "Offensive", "Defensive")
                              # ),
-                             fileInput("bears", "Select Bears Boxscore",
+                             fileInput("mocap", "Select Mocap Data",
                                        multiple = FALSE,
                                        accept = c(
                                            ".xlsx")),
-                             fileInput("opponent", "Select Opponent Boxscore",
-                                       multiple = FALSE,
-                                       accept = c(
-                                           ".xlsx")))
         ),
         
         # Show a plot of the generated distribution
@@ -59,23 +55,16 @@ shinyUI(fluidPage(
             tabsetPanel(
                 tabPanel("Bar Graphs",
                          fluidRow(
-                             conditionalPanel(condition="output.bearsUploaded && !output.opponentUploaded",
-                                              plotlyOutput("bearsBar")),
-                             conditionalPanel(condition="output.opponentUploaded && !output.bearsUploaded",
-                                              plotlyOutput("opponentBar")),
-                             conditionalPanel(condition="output.bearsUploaded && output.opponentUploaded",
-                                              plotlyOutput("combBears"),
-                                              plotlyOutput("combOpponent"))
+                             conditionalPanel(condition="output.mocapUploaded",
+                                              plotlyOutput("mocapBar"))
                              
                          )
                 ),
                 
                 tabPanel("Graphs",
                          fluidRow(
-                         conditionalPanel(condition="output.bearsUploaded",
-                                          plotlyOutput("bearsScatter")),
-                         conditionalPanel(condition="output.opponentUploaded",
-                                          plotlyOutput("opponentScatter"))
+                         conditionalPanel(condition="output.mocapUploaded",
+                                          plotlyOutput("mocapScatter"))
                          )
                 ),
                 tabPanel("Modelling")
