@@ -18,7 +18,8 @@ library(png)
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
     # Application title
-    setBackgroundImage(src = "dansk-atletik.jpeg"),
+  setBackgroundColor("#475cc7"),
+    # setBackgroundImage(src = "dansk-atletik.jpeg"), 
     titlePanel(h1(img(height = 1)), windowTitle = 'Analytics'),
     
     # Sidebar with a slider input for number of bins
@@ -32,42 +33,38 @@ shinyUI(fluidPage(
                              conditionalPanel(condition="output.mocapUploaded",
                                               # conditionalPanel(condition="!is.null(output.outSheet)",
                                               #                  uiOutput('sheet')),
-                                              uiOutput('yvar'),
-                                              uiOutput('xvar')),
-                             
-                             conditionalPanel(condition="output.mocapUploaded",
-                                              radioButtons('modify', 'Options:', 
-                                                           c('Total' = 'total',
-                                                             'Per 40 Mins' = 'forty',
-                                                             'Per Match' = 'match'))),
-                             # selectInput(
-                             #     "aspect", "Select Aspect",
-                             #     c("Boxscore", "Offensive", "Defensive")
-                             # ),
+                                              uiOutput('bodypart'),
+                                              uiOutput('frame')
+                                              # uiOutput('xvar')
+                                              ),
+            
                              fileInput("mocap", "Select Mocap Data",
                                        multiple = FALSE,
                                        accept = c(
-                                           ".xlsx")),
+                                           ".csv")
+                                       ),
         ),
         
         # Show a plot of the generated distribution
         mainPanel(
             tabsetPanel(
-                tabPanel("Bar Graphs",
-                         fluidRow(
-                             conditionalPanel(condition="output.mocapUploaded",
-                                              plotlyOutput("mocapBar"))
-                             
-                         )
-                ),
-                
-                tabPanel("Graphs",
-                         fluidRow(
+              tabPanel("Graphs",
+                       fluidRow(
                          conditionalPanel(condition="output.mocapUploaded",
-                                          plotlyOutput("mocapScatter"))
+                                          plotlyOutput("mocap_line")
                          )
-                ),
-                tabPanel("Modelling")
+                       )
+              ),
+              
+              tabPanel("Animation",
+                       fluidRow(
+                           conditionalPanel(condition="output.mocapUploaded",
+                                            plotlyOutput("mocap_pose"))
+
+                       )
+              ),
+              
+              tabPanel("Modelling")
             )
         )
     )
